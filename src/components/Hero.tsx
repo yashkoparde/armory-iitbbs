@@ -58,7 +58,7 @@ export default function Hero() {
         {/* Upper Micro-Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel text-xs font-mono text-arctic/90 mb-8 animate-fade-in uppercase tracking-wider">
           <Cube16Solid className="h-3.5 w-3.5 text-forsythia" />
-          <span>V1.04 Enterprise Data Core</span>
+          <span>Enterprise Data Core</span>
         </div>
 
         {/* H1 Title with Custom Font Hierarchy */}

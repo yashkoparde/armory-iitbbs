@@ -151,7 +151,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: 't3',
-    company: 'Neural Sync',
+    company: 'Data Sync',
     quote: 'The real-time telemetry logs let our monitoring systems observe pipeline outputs instantly. It has become a foundational component of our active validation workflows.',
     author: 'Elena Rostova',
     role: 'Director of Platform Safety',

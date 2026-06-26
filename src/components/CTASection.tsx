@@ -34,10 +34,10 @@ export default function CTASection() {
 
           {/* Header */}
           <h2 id="cta-title" className="text-3xl sm:text-5xl font-sans font-bold tracking-tight text-arctic mb-4 max-w-3xl mx-auto leading-tight">
-            Get smarter about AI systems
+            Get smarter about data systems
           </h2>
           <p className="text-base sm:text-lg text-mystic/70 max-w-2xl mx-auto mb-10 leading-relaxed font-sans">
-            Weekly insights on automation, AI workflows, and real system builds. No fluff, just what actually works in production.
+            Weekly insights on automation, database workflows, and real system builds. No fluff, just what actually works in production.
           </p>
 
           {/* Newsletter form with validation and accessibility states */}

@@ -300,23 +300,9 @@ export default function WorkflowBuilder() {
           
           {/* Main Visual Grid Canvas (Col Span 9) */}
           <div className="lg:col-span-9 relative p-6 sm:p-8 rounded-2xl glass-panel min-h-[500px] flex flex-row overflow-hidden bg-oceanic/40">
-            {/* Sidebar Toolbar inside Canvas */}
-            <div className="w-16 border-r border-arctic/10 pr-4 flex flex-col items-center justify-between z-20">
-              <div className="space-y-6 text-center">
-                <div className="text-[9px] font-mono text-mystic/30 uppercase tracking-widest font-extrabold">Stack</div>
-                <div className="space-y-3">
-                  <div className="p-2.5 rounded-lg bg-forsythia text-oceanic shadow-md shadow-forsythia/10 cursor-pointer font-mono font-bold text-xs">PR</div>
-                  <div className="p-2.5 rounded-lg bg-arctic/5 hover:bg-arctic/10 text-mystic hover:text-arctic cursor-pointer font-mono font-bold text-xs">M</div>
-                  <div className="p-2.5 rounded-lg bg-arctic/5 hover:bg-arctic/10 text-mystic hover:text-arctic cursor-pointer font-mono font-bold text-xs">+</div>
-                </div>
-              </div>
-              <div className="text-center font-mono text-[9px] text-mystic/35">
-                AUTO
-              </div>
-            </div>
-
+            
             {/* Main Interactive Workspace Area */}
-            <div id="workflow-canvas" className="flex-1 pl-6 relative flex flex-col justify-between overflow-hidden">
+            <div id="workflow-canvas" className="flex-1 relative flex flex-col justify-between overflow-hidden">
               {/* Mesh Background Grid */}
               <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(241,246,244,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(241,246,244,0.015)_1px,transparent_1px)] bg-[size:20px_20px]" />
 
@@ -339,20 +325,31 @@ export default function WorkflowBuilder() {
                     <ArrowPath className="h-3.5 w-3.5" />
                     <span>Reset</span>
                   </button>
-                  <button
-                    onClick={runSimulation}
-                    disabled={isRunning}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-xs font-bold uppercase transition-all duration-300 ${
-                      isRunning
-                        ? 'bg-arctic/5 text-mystic/40 cursor-not-allowed'
-                        : 'bg-forsythia hover:bg-saffron text-oceanic transform active:scale-95 shadow-md shadow-forsythia/10'
-                    }`}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="h-3.5 w-3.5">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <span>Run System Test</span>
-                  </button>
+                  
+                  <div className="relative flex items-center">
+                    {!isRunning && (
+                      <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-forsythia text-oceanic font-mono text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-md shadow-lg shadow-forsythia/25 flex items-center gap-1.5 animate-bounce z-30 whitespace-nowrap">
+                        <span>Click to Start Test</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3.5" stroke="currentColor" className="h-3.5 w-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                        </svg>
+                      </div>
+                    )}
+                    <button
+                      onClick={runSimulation}
+                      disabled={isRunning}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-xs font-bold uppercase transition-all duration-300 relative ${
+                        isRunning
+                          ? 'bg-arctic/5 text-mystic/40 cursor-not-allowed'
+                          : 'bg-forsythia hover:bg-saffron text-oceanic transform active:scale-95 shadow-md shadow-forsythia/10 ring-2 ring-forsythia/35'
+                      }`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="h-3.5 w-3.5">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <span>Run System Test</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -365,7 +362,28 @@ export default function WorkflowBuilder() {
                 {paths.p45 && <path d={paths.p45} stroke="rgba(241,246,244,0.08)" strokeWidth="2" fill="none" />}
                 {paths.p46 && <path d={paths.p46} stroke="rgba(241,246,244,0.08)" strokeWidth="2" fill="none" />}
 
-                {/* 2. Active Pulsing Flow Paths matching current simulation active index */}
+                {/* 2. Completed Glowing Paths */}
+                {(isRunning || activeStep === 'done') && (
+                  <>
+                    {['n2', 'n3', 'n4', 'n5', 'done'].includes(activeStep) && paths.p12 && (
+                      <path d={paths.p12} stroke="#FFC801" strokeWidth="2" fill="none" opacity="0.6" />
+                    )}
+                    {['n3', 'n4', 'n5', 'done'].includes(activeStep) && paths.p23 && (
+                      <path d={paths.p23} stroke="#FFC801" strokeWidth="2" fill="none" opacity="0.6" />
+                    )}
+                    {['n4', 'n5', 'done'].includes(activeStep) && paths.p34 && (
+                      <path d={paths.p34} stroke="#FF9932" strokeWidth="2" fill="none" opacity="0.6" />
+                    )}
+                    {['n5', 'done'].includes(activeStep) && (
+                      <>
+                        {paths.p45 && <path d={paths.p45} stroke="#FF9932" strokeWidth="2" fill="none" opacity="0.6" />}
+                        {paths.p46 && <path d={paths.p46} stroke="#FF9932" strokeWidth="2" fill="none" opacity="0.6" />}
+                      </>
+                    )}
+                  </>
+                )}
+
+                {/* 3. Active Pulsing Flow Paths matching current simulation active index */}
                 {isRunning && (
                   <>
                     {activeStep === 'n1' && paths.p12 && (
@@ -385,8 +403,8 @@ export default function WorkflowBuilder() {
                     )}
                     {activeStep === 'n5' && (
                       <>
-                        {paths.p45 && <path d={paths.p45} stroke="#FFC801" strokeWidth="2.5" fill="none" strokeDasharray="6 6" className="animate-dash-flow" />}
-                        {paths.p46 && <path d={paths.p46} stroke="#FFC801" strokeWidth="2.5" fill="none" strokeDasharray="6 6" className="animate-dash-flow" />}
+                        {paths.p45 && <path d={paths.p45} stroke="#FF9932" strokeWidth="2.5" fill="none" strokeDasharray="6 6" className="animate-dash-flow" />}
+                        {paths.p46 && <path d={paths.p46} stroke="#FF9932" strokeWidth="2.5" fill="none" strokeDasharray="6 6" className="animate-dash-flow" />}
                       </>
                     )}
                   </>
@@ -417,6 +435,13 @@ export default function WorkflowBuilder() {
                             : 'border-arctic/10 bg-oceanic/80 hover:border-arctic/20'
                         }`}
                       >
+                        {/* Active pulsing notification dot */}
+                        {isActive && (
+                          <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forsythia opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-forsythia"></span>
+                          </span>
+                        )}
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-forsythia/20' : 'bg-arctic/5'}`}>
@@ -458,6 +483,13 @@ export default function WorkflowBuilder() {
                             : 'border-arctic/10 bg-oceanic/80 hover:border-arctic/20'
                         }`}
                       >
+                        {/* Active pulsing notification dot */}
+                        {isActive && (
+                          <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forsythia opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-forsythia"></span>
+                          </span>
+                        )}
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-forsythia/20' : 'bg-arctic/5'}`}>
@@ -482,7 +514,7 @@ export default function WorkflowBuilder() {
                 <div className="space-y-10 flex flex-col justify-center h-full">
                   {nodes.slice(4, 6).map((node) => {
                     const isSelected = selectedNodeId === node.id;
-                    const isActive = isRunning && activeStep === 'n5'; // active during endpoint run
+                    const isActive = isRunning && node.status === 'running';
                     const isCompleted = node.status === 'success';
                     return (
                       <div
@@ -499,6 +531,13 @@ export default function WorkflowBuilder() {
                             : 'border-arctic/10 bg-oceanic/80 hover:border-arctic/20'
                         }`}
                       >
+                        {/* Active pulsing notification dot */}
+                        {isActive && (
+                          <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-forsythia opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-forsythia"></span>
+                          </span>
+                        )}
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-forsythia/20' : 'bg-arctic/5'}`}>
@@ -576,7 +615,7 @@ export default function WorkflowBuilder() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="h-3.5 w-3.5 text-forsythia">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                 </svg>
-                <span>Compiler: Safe v1.02</span>
+                <span>Compiler Status: Secure</span>
               </div>
             </div>
           </div>
