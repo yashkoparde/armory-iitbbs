@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { pricingConfig } from '../data/landingData';
 import { Plan } from '../types';
 import { ChevronRight, Cube16Solid } from './SvgIcons';
@@ -14,7 +14,7 @@ interface PricingCardProps {
 
 // PricingCard component renders the initial USD monthly values
 const PricingCard = React.memo(({ plan }: PricingCardProps) => {
-  const initialPrice = plan.basePrice; // Initial is USD monthly (multiplier = 1, discount = 1)
+  const initialPrice = plan.basePrice; // Initial is USD monthly
   
   return (
     <div
@@ -24,7 +24,7 @@ const PricingCard = React.memo(({ plan }: PricingCardProps) => {
           : 'border-arctic/10 hover:border-arctic/20'
       }`}
     >
-      {/* Decorative Popular Banner */}
+      {/* Decorative Recommended Banner */}
       {plan.popular && (
         <span className="absolute top-0 right-1/2 transform translate-x-1/2 -translate-y-1/2 px-3 py-1 bg-forsythia text-oceanic font-mono text-[10px] font-extrabold uppercase rounded-full tracking-wider shadow-md">
           Recommended
@@ -85,138 +85,83 @@ const PricingCard = React.memo(({ plan }: PricingCardProps) => {
 PricingCard.displayName = 'PricingCard';
 
 // Isolated engine holding selectors locally to ensure zero parent or global page re-renders
-function PricingEngine() {
-  
-  useEffect(() => {
-    let currentCurrency = 'USD';
-    let currentIsAnnual = false;
+const PricingEngine = React.memo(() => {
+  const currentCurrency = useRef<string>('USD');
+  const currentIsAnnual = useRef<boolean>(false);
 
-    // Helper to calculate price and update the DOM directly
-    const updatePrices = (currencyCode: string, isAnnual: boolean) => {
-      // 1. Update prices for each card
-      pricingConfig.plans.forEach((plan) => {
-        const currencyObj = pricingConfig.currencies.find((c) => c.code === currencyCode);
-        const multiplier = currencyObj ? currencyObj.regionalMultiplier : 1;
-        const symbol = currencyObj ? currencyObj.symbol : '$';
-        const rawPrice = plan.basePrice * multiplier * (isAnnual ? pricingConfig.annualDiscount : 1);
-        const calculatedPrice = Math.round(rawPrice);
+  // Helper to calculate price and update the DOM directly
+  const updatePrices = (currencyCode: string, isAnnual: boolean) => {
+    pricingConfig.plans.forEach((plan) => {
+      const currencyObj = pricingConfig.currencies.find((c) => c.code === currencyCode);
+      const multiplier = currencyObj ? currencyObj.regionalMultiplier : 1;
+      const symbol = currencyObj ? currencyObj.symbol : '$';
+      const rawPrice = plan.basePrice * multiplier * (isAnnual ? pricingConfig.annualDiscount : 1);
+      const calculatedPrice = Math.round(rawPrice);
 
-        const valNode = document.getElementById(`price-val-${plan.id}`);
-        if (valNode) {
-          valNode.textContent = `${symbol}${calculatedPrice.toLocaleString()}`;
-        }
-
-        const periodNode = document.getElementById(`price-period-${plan.id}`);
-        if (periodNode) {
-          periodNode.textContent = isAnnual ? '/ mo paid annual' : '/ month';
-        }
-      });
-
-      // 2. Update currency button active/inactive styling states
-      pricingConfig.currencies.forEach((curr) => {
-        const btn = document.getElementById(`currency-btn-${curr.code}`);
-        if (btn) {
-          if (curr.code === currencyCode) {
-            btn.className = "px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all bg-forsythia text-oceanic shadow-md";
-          } else {
-            btn.className = "px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all text-mystic/55 hover:text-arctic hover:bg-arctic/5";
-          }
-        }
-      });
-
-      // 3. Update billing labels
-      const monthlyBtn = document.getElementById('billing-btn-monthly');
-      if (monthlyBtn) {
-        monthlyBtn.className = `text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
-          !isAnnual ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
-        }`;
+      const valNode = document.getElementById(`price-val-${plan.id}`);
+      if (valNode) {
+        valNode.textContent = `${symbol}${calculatedPrice.toLocaleString()}`;
       }
 
-      const annualBtn = document.getElementById('billing-btn-annual');
-      if (annualBtn) {
-        annualBtn.className = `flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
-          isAnnual ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
-        }`;
-      }
-
-      // 4. Update slider circle translation
-      const toggleCircle = document.getElementById('billing-toggle-circle');
-      if (toggleCircle) {
-        if (isAnnual) {
-          toggleCircle.classList.remove('translate-x-0');
-          toggleCircle.classList.add('translate-x-6');
-        } else {
-          toggleCircle.classList.remove('translate-x-6');
-          toggleCircle.classList.add('translate-x-0');
-        }
-      }
-    };
-
-    // Attach currency switcher event listeners
-    pricingConfig.currencies.forEach((curr) => {
-      const btn = document.getElementById(`currency-btn-${curr.code}`);
-      if (btn) {
-        const listener = () => {
-          currentCurrency = curr.code;
-          updatePrices(currentCurrency, currentIsAnnual);
-        };
-        btn.addEventListener('click', listener);
-        (btn as any)._listener = listener;
+      const periodNode = document.getElementById(`price-period-${plan.id}`);
+      if (periodNode) {
+        periodNode.textContent = isAnnual ? '/ mo paid annual' : '/ month';
       }
     });
 
-    // Attach billing toggle event listeners
+    // Update currency button active/inactive styling states
+    pricingConfig.currencies.forEach((curr) => {
+      const btn = document.getElementById(`currency-btn-${curr.code}`);
+      if (btn) {
+        if (curr.code === currencyCode) {
+          btn.className = "px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all bg-forsythia text-oceanic shadow-md";
+        } else {
+          btn.className = "px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all text-mystic/55 hover:text-arctic hover:bg-arctic/5";
+        }
+      }
+    });
+
+    // Update billing labels
     const monthlyBtn = document.getElementById('billing-btn-monthly');
     if (monthlyBtn) {
-      const listener = () => {
-        currentIsAnnual = false;
-        updatePrices(currentCurrency, currentIsAnnual);
-      };
-      monthlyBtn.addEventListener('click', listener);
-      (monthlyBtn as any)._listener = listener;
+      monthlyBtn.className = `text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
+        !isAnnual ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
+      }`;
     }
 
     const annualBtn = document.getElementById('billing-btn-annual');
     if (annualBtn) {
-      const listener = () => {
-        currentIsAnnual = true;
-        updatePrices(currentCurrency, currentIsAnnual);
-      };
-      annualBtn.addEventListener('click', listener);
-      (annualBtn as any)._listener = listener;
+      annualBtn.className = `flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
+        isAnnual ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
+      }`;
     }
 
-    const sliderBtn = document.getElementById('billing-toggle-slider');
-    if (sliderBtn) {
-      const listener = () => {
-        currentIsAnnual = !currentIsAnnual;
-        updatePrices(currentCurrency, currentIsAnnual);
-      };
-      sliderBtn.addEventListener('click', listener);
-      (sliderBtn as any)._listener = listener;
+    // Update slider circle translation
+    const toggleCircle = document.getElementById('billing-toggle-circle');
+    if (toggleCircle) {
+      if (isAnnual) {
+        toggleCircle.classList.remove('translate-x-0');
+        toggleCircle.classList.add('translate-x-6');
+      } else {
+        toggleCircle.classList.remove('translate-x-6');
+        toggleCircle.classList.add('translate-x-0');
+      }
     }
+  };
 
-    // Set initial active state layout style
-    updatePrices(currentCurrency, currentIsAnnual);
+  const selectCurrency = (code: string) => {
+    currentCurrency.current = code;
+    updatePrices(currentCurrency.current, currentIsAnnual.current);
+  };
 
-    // Clean up event listeners on unmount
-    return () => {
-      pricingConfig.currencies.forEach((curr) => {
-        const btn = document.getElementById(`currency-btn-${curr.code}`);
-        if (btn && (btn as any)._listener) {
-          btn.removeEventListener('click', (btn as any)._listener);
-        }
-      });
-      if (monthlyBtn && (monthlyBtn as any)._listener) {
-        monthlyBtn.removeEventListener('click', (monthlyBtn as any)._listener);
-      }
-      if (annualBtn && (annualBtn as any)._listener) {
-        annualBtn.removeEventListener('click', (annualBtn as any)._listener);
-      }
-      if (sliderBtn && (sliderBtn as any)._listener) {
-        sliderBtn.removeEventListener('click', (sliderBtn as any)._listener);
-      }
-    };
+  const selectBilling = (annual: boolean) => {
+    currentIsAnnual.current = annual;
+    updatePrices(currentCurrency.current, currentIsAnnual.current);
+  };
+
+  // Set initial active state layout style on mount
+  useEffect(() => {
+    updatePrices(currentCurrency.current, currentIsAnnual.current);
   }, []);
 
   return (
@@ -225,22 +170,33 @@ function PricingEngine() {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
         {/* Currency Controls */}
         <div className="flex items-center gap-1 bg-oceanic/80 border border-arctic/10 p-1 rounded-xl">
-          {pricingConfig.currencies.map((curr) => (
-            <button
-              id={`currency-btn-${curr.code}`}
-              key={curr.code}
-              className="px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all text-mystic/55 hover:text-arctic hover:bg-arctic/5"
-            >
-              {curr.code}
-            </button>
-          ))}
+          {pricingConfig.currencies.map((curr) => {
+            const isActive = currentCurrency.current === curr.code;
+            return (
+              <button
+                id={`currency-btn-${curr.code}`}
+                key={curr.code}
+                onClick={() => selectCurrency(curr.code)}
+                className={`px-4 py-2 rounded-lg font-mono text-xs font-bold transition-all ${
+                  isActive
+                    ? 'bg-forsythia text-oceanic shadow-md'
+                    : 'text-mystic/55 hover:text-arctic hover:bg-arctic/5'
+                }`}
+              >
+                {curr.code}
+              </button>
+            );
+          })}
         </div>
 
         {/* Billing Cycles Toggles */}
         <div className="flex items-center gap-3">
           <button
             id="billing-btn-monthly"
-            className="text-xs font-mono uppercase tracking-widest font-bold transition-colors text-mystic/55 hover:text-arctic"
+            onClick={() => selectBilling(false)}
+            className={`text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
+              !currentIsAnnual.current ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
+            }`}
           >
             Monthly
           </button>
@@ -248,18 +204,24 @@ function PricingEngine() {
           {/* Slider switch */}
           <button
             id="billing-toggle-slider"
+            onClick={() => selectBilling(!currentIsAnnual.current)}
             className="w-12 h-6 bg-arctic/10 border border-arctic/10 rounded-full p-0.5 transition-colors focus:outline-none focus:ring-1 focus:ring-forsythia relative"
             aria-label="Toggle annual pricing"
           >
             <div
               id="billing-toggle-circle"
-              className="h-4 w-4 rounded-full bg-forsythia transition-transform duration-300 translate-x-0"
+              className={`h-4 w-4 rounded-full bg-forsythia transition-transform duration-300 ${
+                currentIsAnnual.current ? 'translate-x-6' : 'translate-x-0'
+              }`}
             />
           </button>
 
           <button
             id="billing-btn-annual"
-            className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest font-bold transition-colors text-mystic/55 hover:text-arctic"
+            onClick={() => selectBilling(true)}
+            className={`flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest font-bold transition-colors ${
+              currentIsAnnual.current ? 'text-forsythia' : 'text-mystic/55 hover:text-arctic'
+            }`}
           >
             <span>Annual</span>
             <span className="px-1.5 py-0.5 bg-forsythia/10 border border-forsythia/20 rounded text-[9px] font-mono text-forsythia uppercase">
@@ -277,9 +239,11 @@ function PricingEngine() {
       </div>
     </div>
   );
-}
+});
 
-export default function PricingSection() {
+PricingEngine.displayName = 'PricingEngine';
+
+const PricingSection = React.memo(() => {
   return (
     <section id="pricing" className="py-24 bg-oceanic border-t border-arctic/5 relative overflow-hidden" aria-labelledby="pricing-title">
       {/* Background Soft Glow */}
@@ -329,4 +293,8 @@ export default function PricingSection() {
       </div>
     </section>
   );
-}
+});
+
+PricingSection.displayName = 'PricingSection';
+
+export default PricingSection;
