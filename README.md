@@ -15,7 +15,7 @@
 
 *A premium, high-converting, performance-isolated SaaS experience engineered around the modern **Oceanic Noir** design system.*
 
-[Live Deployed Link](https://ais-pre-7tdymh3hhzqchry25ojp4x-61252224755.asia-southeast1.run.app)
+[Live Deployed Link](https://armory-iitbbs.vercel.app)
 
 ---
 
