@@ -1,0 +1,6 @@
+{
+  "name": "Armory",
+  "description": "Premium enterprise-grade AI Data Automation Platform. Automate workflows, manage neural agents, and orchestrate complex enterprise data pipelines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
