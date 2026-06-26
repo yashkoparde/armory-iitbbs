@@ -15,21 +15,21 @@
 
 *A premium, high-converting, performance-isolated SaaS experience engineered around the modern **Oceanic Noir** design system.*
 
-[🪐 Explore Shared App](https://ais-pre-7tdymh3hhzqchry25ojp4x-61252224755.asia-southeast1.run.app) • [⚡ View Local Development](https://ais-dev-7tdymh3hhzqchry25ojp4x-61252224755.asia-southeast1.run.app)
+[Live Deployed Link](https://ais-pre-7tdymh3hhzqchry25ojp4x-61252224755.asia-southeast1.run.app)
 
 ---
 
 </div>
 
-  ## 🌐 1. Architectural Integrity & State Isolation (40 Points)
+  ## 🌐 1. Architectural Integrity & State Isolation
 
-  ### 📌 Feature 1: Dynamic Multi-Currency Pricing calculation (15 pts)
+  ### 📌 Feature 1: Dynamic Multi-Currency Pricing calculation
   * **The Concept**: Dynamic, multi-dimensional matrix-based price evaluation calculated entirely from structured configuration rather than hardcoded client-side templates.
   * **The Logic Formula**:
     $$\text{Price} = \text{basePrice} \times \text{regionalMultiplier} \times (1 - \text{discount})$$
   * **Where to find it**: `/src/components/PricingSection.tsx` (Lines 18-32), config variables mapped in `/src/data/landingData.ts` (Lines 214-255).
 
-  ### 📌 The Re-render & State Isolation Guardrail (15 pts)
+  ### 📌 The Re-render & State Isolation Guardrail 
   * **The Challenge**: Changing currency toggles or billing cycles must **not** cause parent layout re-renders or page-level reflows.
   * **Our Solution**:
     1. The pricing state (`currency`, `isAnnual`) is fully contained in a localized `<PricingEngine>` container component rather than at the parent page root.
